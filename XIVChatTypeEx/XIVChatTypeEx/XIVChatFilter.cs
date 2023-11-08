@@ -349,7 +349,7 @@ internal class XivChatFilter
         },
     };
 
-    private readonly List<(Group, Group, Channel)> _filterList;
+    private readonly List<XivChannelDescriptor> _filterList;
     //public bool[][] FilterTable = new bool[14][]
     //        {
     //            new bool[27],   //General
@@ -688,11 +688,11 @@ internal class XivChatFilter
     };
 
 
-    public XivChatFilter() { _filterList = new List<(Group, Group, Channel)>(); }
+    public XivChatFilter() { _filterList = new List<XivChannelDescriptor>(); }
 
     public XivChatFilter(bool[][] filterTable)
     {
-        _filterList = new List<(Group, Group, Channel)>();
+        _filterList = new List<XivChannelDescriptor>();
         ParseFilterTable(filterTable);
     }
 
@@ -712,7 +712,7 @@ internal class XivChatFilter
     public void Add(uint magic)
     {
         var chatType = XivChatTypeEx.Decode(magic);
-        Add(chatType);
+        Add((chatType.Source, chatType.Target, chatType.Channel));
     }
 
 
@@ -730,10 +730,10 @@ internal class XivChatFilter
     public void Remove(uint magic)
     {
         var chatType = XivChatTypeEx.Decode(magic);
-        Remove(chatType);
+        Remove((chatType.Source, chatType.Target, chatType.Channel));
     }
 
-    public bool Match((Group, Group, Channel) chatType) => _filterList.Contains(chatType);
+    public bool Match(XivChannelDescriptor chatType) => _filterList.Contains(chatType);
 
     public bool Match(uint magic)
     {
@@ -741,11 +741,11 @@ internal class XivChatFilter
         return Match(chatType);
     }
 
-    private static List<(Group, Group, Channel)> ExpandFilter((Group?, Group?, Channel) filter)
+    private static List<XivChannelDescriptor> ExpandFilter((Group?, Group?, Channel) filter)
     {
         var (source, target, channel) = filter;
         List<Group>                   intermediate = new();
-        List<(Group, Group, Channel)> result       = new();
+        List<XivChannelDescriptor> result       = new();
         if (source == null)
             foreach (var a in Enum.GetValues(typeof(Group)))
                 intermediate.Add((Group)a);
@@ -754,11 +754,11 @@ internal class XivChatFilter
 
         if (target == null)
             foreach (var source1 in intermediate) {
-                foreach (var a in Enum.GetValues(typeof(Group))) result.Add((source1, (Group)a, channel));
+                foreach (var a in Enum.GetValues(typeof(Group))) result.Add(new XivChannelDescriptor(source1, (Group)a, channel));
             }
         else
             foreach (var source1 in intermediate)
-                result.Add((source1, (Group)target, channel));
+                result.Add(new XivChannelDescriptor(source1, (Group)target, channel));
 
         return result;
     }

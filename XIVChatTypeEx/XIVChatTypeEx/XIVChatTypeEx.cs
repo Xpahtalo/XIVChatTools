@@ -109,31 +109,19 @@ public class XivChatTypeEx
     /// </summary>
     /// <param name="magic">The magic number from XivChatType as a uint</param>
     /// <returns>
-    ///     A tuple containing the source as a Group enum, target as a Group enum, and channel as a Channel enum in that
-    ///     order.
+    ///     A <see cref="XivChannelDescriptor"/> describing the chat type.
     /// </returns>
-    public static (Group, Group, Channel) Decode(uint magic)
+    public static XivChannelDescriptor Decode(uint magic)
     {
-        var chatBaseType = (Channel)(magic & 0x007F);
-        var chatSource   = (Group)(magic >> 11);
-        var chatTarget   = (Group)((magic >> 7) & 0xF);
-
-        return (chatSource, chatTarget, chatBaseType);
+        return new XivChannelDescriptor(magic);
     }
 
     /// <summary>
     ///     Encodes a chat type into the magic number expected by Dalamud's XivChatType
     /// </summary>
-    /// <param name="chatType">
-    ///     A tuple containing the source as a Group enum, target as a Group enum, and channel as a Channel
-    ///     enum in that order.
-    /// </param>
+    /// <param name="chatDescriptor">A <see cref="XivChannelDescriptor"/> containing the channel information to encode</param>
     /// <returns>The magic number for XivChatType as a uint</returns>
-    public static uint Encode((Group, Group, Channel) chatType)
-    {
-        var (source, target, channel) = chatType;
-        return (uint)channel | ((uint)target << 7) | ((uint)source << 11);
-    }
+    public static uint Encode(XivChannelDescriptor chatDescriptor) => (uint)chatDescriptor.Channel | ((uint)chatDescriptor.Target << 7) | ((uint)chatDescriptor.Source << 11);
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
