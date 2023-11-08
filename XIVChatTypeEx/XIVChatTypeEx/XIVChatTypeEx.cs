@@ -109,17 +109,14 @@ public class XivChatTypeEx
     /// </summary>
     /// <param name="magic">The magic number from XivChatType as a uint</param>
     /// <returns>
-    ///     A <see cref="XivChannelDescriptor"/> describing the chat type.
+    ///     A <see cref="XivChannelDescriptor" /> describing the chat type.
     /// </returns>
-    public static XivChannelDescriptor Decode(uint magic)
-    {
-        return new XivChannelDescriptor(magic);
-    }
+    public static XivChannelDescriptor Decode(uint magic) => new(magic);
 
     /// <summary>
     ///     Encodes a chat type into the magic number expected by Dalamud's XivChatType
     /// </summary>
-    /// <param name="chatDescriptor">A <see cref="XivChannelDescriptor"/> containing the channel information to encode</param>
+    /// <param name="chatDescriptor">A <see cref="XivChannelDescriptor" /> containing the channel information to encode</param>
     /// <returns>The magic number for XivChatType as a uint</returns>
     public static uint Encode(XivChannelDescriptor chatDescriptor) => (uint)chatDescriptor.Channel | ((uint)chatDescriptor.Target << 7) | ((uint)chatDescriptor.Source << 11);
 }
